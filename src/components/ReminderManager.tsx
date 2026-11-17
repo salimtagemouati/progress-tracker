@@ -25,13 +25,16 @@ const parseTime = (time: string) => {
   };
 };
 
+let pendingSync = Promise.resolve();
+
 export default function ReminderManager() {
   const { loaded, preferences } = useDailyProgress();
   const { isNative } = useNativeFeatures();
 
   useEffect(() => {
+    let active = true;
     const syncNotifications = async () => {
-      if (!loaded) return;
+      if (!active || !loaded) return;
       if (!Capacitor.isPluginAvailable("LocalNotifications") || !isNative) return;
 
       const wantsNotifications =
@@ -91,7 +94,7 @@ export default function ReminderManager() {
           });
         }
 
-        if (notifications.length > 0) {
+        if (active && notifications.length > 0) {
           await LocalNotifications.schedule({ notifications });
         }
       } catch (error) {
@@ -99,7 +102,8 @@ export default function ReminderManager() {
       }
     };
 
-    void syncNotifications();
+    pendingSync = pendingSync.then(syncNotifications, syncNotifications);
+    return () => { active = false; };
   }, [loaded, preferences, isNative]);
 
   return null;

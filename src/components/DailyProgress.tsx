@@ -43,7 +43,7 @@ const formatDateLabel = (dateKey: string) => {
 };
 
 const withinCurrentWeek = (entryDate: string) => {
-  const entry = new Date(entryDate);
+  const entry = toDateFromKey(entryDate);
   const today = new Date();
   const startOfWeek = new Date(today);
   const day = today.getDay(); // 0 (Sun) - 6 (Sat)
@@ -63,9 +63,9 @@ const toDateFromKey = (key: string) => {
 };
 
 const dayDiff = (a: Date, b: Date) => {
-  const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
-  const end = new Date(b.getFullYear(), b.getMonth(), b.getDate());
-  const diff = (start.getTime() - end.getTime()) / 86_400_000;
+  const start = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const end = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  const diff = (start - end) / 86_400_000;
   return Math.trunc(diff);
 };
 
@@ -78,7 +78,7 @@ const calculateStreak = (entries: DailyMetrics[], predicate: (entry: DailyMetric
     const entryDate = toDateFromKey(entry.date);
 
     if (lastDate === null) {
-      if (!predicate(entry)) break;
+      if (dayDiff(new Date(), entryDate) > 1 || !predicate(entry)) break;
       streak = 1;
       lastDate = entryDate;
       continue;

@@ -1,7 +1,7 @@
 PODS:
-  - Capacitor (7.4.2):
+  - Capacitor (7.6.10):
     - CapacitorCordova
-  - CapacitorCordova (7.4.2)
+  - CapacitorCordova (7.6.10)
   - CapacitorDevice (7.0.2):
     - Capacitor
   - CapacitorHaptics (7.0.2):
@@ -39,8 +39,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
 
 SPEC CHECKSUMS:
-  Capacitor: 9d9e481b79ffaeacaf7a85d6a11adec32bd33b59
-  CapacitorCordova: 5e58d04631bc5094894ac106e2bf1da18a9e6151
+  Capacitor: f50a57c9ce466bce30d574e1348ab25b1f572536
+  CapacitorCordova: 33313bf8891d44741970e16534be781ff3caa00a
   CapacitorDevice: 81ae78d5d1942707caad79276badd458bf6ec603
   CapacitorHaptics: b3fb2869e72c4466e18ce9ccbeb60a3d8723b3d4
   CapacitorKeyboard: a86aa9e4741b6444a802df26440a92ae041b34a6
@@ -49,4 +49,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: cbb47d1b0a26c6b41ad9c42e7b8f242e99190909
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0
