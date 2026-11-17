@@ -25,45 +25,30 @@ interface State {
 
 const KEY = "activities.v1";
 
-export const useActivities = create<State>((set, get) => ({
+let pending = Promise.resolve();
+
+function updateItems(change?: (items: Activity[]) => Activity[]) {
+  const update = async () => {
+    const stored = await localforage.getItem<Activity[]>(KEY);
+    if (stored !== null && !Array.isArray(stored)) throw new Error("Invalid activity storage");
+    const items = change ? change(stored ?? []) : stored ?? [];
+    if (change) await localforage.setItem(KEY, items);
+    useActivities.setState({ items, loaded: true });
+  };
+  const run = () => navigator.locks ? navigator.locks.request(KEY, update) : update();
+  pending = pending.then(run, run);
+  return pending;
+}
+
+export const useActivities = create<State>(() => ({
   items: [],
   loaded: false,
-
-  async load() {
-    const data = (await localforage.getItem<Activity[]>(KEY)) ?? [];
-    set({ items: data, loaded: true });
-  },
-
-  async add(a) {
-    const newItem: Activity = { 
-      id: crypto.randomUUID(), 
-      status: "Pending" as Status, 
-      createdAt: Date.now(), 
-      ...a 
-    };
-    const next = [newItem, ...get().items];
-    await localforage.setItem(KEY, next);
-    set({ items: next });
-  },
-
-  async toggle(id) {
-    const next = get().items.map(it => 
-      it.id === id 
-        ? { ...it, status: (it.status === "Done" ? "Pending" : "Done") as Status } 
-        : it
-    );
-    await localforage.setItem(KEY, next);
-    set({ items: next });
-  },
-
-  async remove(id) {
-    const next = get().items.filter(it => it.id !== id);
-    await localforage.setItem(KEY, next);
-    set({ items: next });
-  },
-
-  async clearAll() {
-    await localforage.setItem(KEY, []);
-    set({ items: [] });
-  }
+  load: () => updateItems(),
+  add: activity => updateItems(items => [{
+    ...activity, id: crypto.randomUUID(), status: "Pending", createdAt: Date.now(),
+  }, ...items]),
+  toggle: id => updateItems(items => items.map(item => item.id === id
+    ? { ...item, status: item.status === "Done" ? "Pending" : "Done" } : item)),
+  remove: id => updateItems(items => items.filter(item => item.id !== id)),
+  clearAll: () => updateItems(() => []),
 }));

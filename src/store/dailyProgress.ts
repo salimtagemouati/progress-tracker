@@ -296,7 +296,7 @@ export const useDailyProgress = create<DailyProgressState>((set, get) => ({
     const todayEntry = state.ensureEntry(todayKey);
     const updatedToday = {
       ...todayEntry,
-      reading: { ...todayEntry.reading, unit },
+      reading: todayEntry.reading.current > 0 ? todayEntry.reading : { ...todayEntry.reading, unit },
       updatedAt: Date.now(),
     };
 
